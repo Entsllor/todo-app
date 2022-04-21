@@ -1,0 +1,24 @@
+Flask
+pydantic
+requests
+Flask-Pydantic
+flask-cors
+
+# security
+python-jose[cryptography]
+passlib
+
+# DB
+SQLAlchemy
+Flask-SQLAlchemy
+alembic
+psycopg2-binary
+
+# tests
+pytest
+
+# deploy
+gunicorn
+
+# utils
+pip-tools
