@@ -3,6 +3,7 @@ pydantic
 requests
 Flask-Pydantic
 flask-cors
+Flask-Migrate
 
 # security
 python-jose[cryptography]
