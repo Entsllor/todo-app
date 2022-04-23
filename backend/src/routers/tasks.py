@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from flask_pydantic import validate
 from flask import Blueprint, abort
 from .. import models
@@ -14,9 +16,9 @@ def read_tasks():
     return list(map(TaskOut.from_orm, tasks))
 
 
-@blueprint.get("/tasks/<int:task_id>")
+@blueprint.get("/tasks/<string:task_id>")
 @validate()
-def read_task(task_id: int):
+def read_task(task_id: UUID):
     task = models.Task.query.get(task_id)
     return TaskOut.from_orm(task)
 
@@ -31,10 +33,10 @@ def create_task(body: TaskCreate):
     return TaskOut.from_orm(db_task)
 
 
-@blueprint.put("/tasks/<int:task_id>")
-@blueprint.patch("/tasks/<int:task_id>")
+@blueprint.put("/tasks/<string:task_id>")
+@blueprint.patch("/tasks/<string:task_id>")
 @validate(on_success_status=200)
-def update_task(body: TaskUpdate, task_id):
+def update_task(body: TaskUpdate, task_id: UUID):
     updated = db.session.query(models.Task).filter_by(id=task_id).update(body.dict())
     db.session.commit()
     if not updated:

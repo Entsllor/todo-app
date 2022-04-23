@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -14,7 +15,7 @@ def get_optional_schema(base_model_class):
 
 class TaskBase(BaseModel):
     title: str
-    description: str
+    description: str | None
 
     class Config:
         orm_mode = True
@@ -30,4 +31,4 @@ class TaskUpdate(TaskCreate):
 
 class TaskOut(TaskCreate):
     created_at: datetime
-    id: int
+    id: UUID

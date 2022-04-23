@@ -10,6 +10,7 @@ NEW_TASK_DATA = {
     'description': "DESCRIPTION",
     'deadline': (datetime.now() + timedelta(1)).strftime(DATETIME_FORMAT)
 }
+WRONG_UUID = "00000000-0000-0000-0000-000000000000"
 
 
 def test_create_task(client):
@@ -68,14 +69,14 @@ def test_update_task(client, tasks):
     assert db_task.deadline.strftime(DATETIME_FORMAT) == new_data['deadline']
 
 
-def test_failed_update_task(client, tasks):
+def test_failed_update_task_not_found(client, tasks):
     db_task = tasks[-1]
     new_data = {
         "title": db_task.title + "__updated",
         "description": db_task.description + "__updated",
         "deadline": (db_task.deadline + timedelta(1)).strftime(DATETIME_FORMAT)
     }
-    response = client.put(f"/tasks/{db_task.id + 10000}", json=new_data)
+    response = client.put(f"/tasks/{WRONG_UUID}", json=new_data)
     assert response.status_code == 404
     assert db_task.title != new_data['title']
     assert db_task.description != new_data['description']
@@ -95,6 +96,6 @@ def test_patch_task(client, tasks):
 def test_failed_patch_task_not_found(client, tasks):
     db_task = tasks[-1]
     new_data = {"title": db_task.title + "__updated", }
-    response = client.patch(f"/tasks/{db_task.id + 10000}", json=new_data)
+    response = client.patch(f"/tasks/{WRONG_UUID}", json=new_data)
     assert response.status_code == 404
     assert db_task.title != new_data['title']
