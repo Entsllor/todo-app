@@ -20,10 +20,11 @@ def test_create_task(client):
     assert new_task['title'] == NEW_TASK_DATA['title']
     assert new_task['description'] == NEW_TASK_DATA['description']
     assert new_task['deadline'] == NEW_TASK_DATA['deadline']
+    assert new_task['status'] == 'pending'
 
 
 @pytest.fixture(scope="function")
-def tasks(db, session):
+def tasks(session):
     new_tasks = [
         models.Task(
             title=f"task_{i}",
@@ -53,6 +54,7 @@ def test_read_task(client, tasks):
     assert task_from_response['title'] == task.title
     assert task_from_response['deadline'] == task.deadline.strftime(DATETIME_FORMAT)
     assert task_from_response['description'] == task.description
+    assert task_from_response['status'] == task.status
 
 
 def test_update_task(client, tasks):
@@ -99,3 +101,13 @@ def test_failed_patch_task_not_found(client, tasks):
     response = client.patch(f"/tasks/{WRONG_UUID}", json=new_data)
     assert response.status_code == 404
     assert db_task.title != new_data['title']
+
+
+def test_patch_set_task_completed(client, tasks):
+    db_task = tasks[-1]
+    assert not db_task.is_completed
+    new_data = {"is_completed": True}
+    response = client.patch(f"/tasks/{db_task.id}", json=new_data)
+    assert response.status_code == 200
+    assert db_task.is_completed
+    assert db_task.status == 'completed'
