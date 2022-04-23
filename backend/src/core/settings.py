@@ -14,6 +14,7 @@ class AppSettings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_SECONDS: int = 60 * 20
     REFRESH_TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 30
     ALEMBIC_PATH: Path | str = BASE_PATH.parent.joinpath("migrations")
+    PASSWORD_HASHING_SCHEMAS: list = ['scrypt']
 
     class Config:
         env_file = BASE_PATH.joinpath(".env")

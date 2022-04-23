@@ -1,5 +1,5 @@
 from flask import Flask
-from .routers import tasks
+from .routers import tasks, users
 from .core.database import db, migrate
 from .core.settings import get_settings
 
@@ -7,6 +7,7 @@ from .core.settings import get_settings
 def create_app(settings):
     new_app = Flask(__name__)
     new_app.register_blueprint(tasks.blueprint)
+    new_app.register_blueprint(users.blueprint)
     new_app.config["SECRET_KEY"] = settings.SECRET_KEY
     new_app.config["SQLALCHEMY_DATABASE_URI"] = settings.DB_URI
     new_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
