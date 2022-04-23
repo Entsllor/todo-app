@@ -1,12 +1,12 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-
-from .core.settings import settings
+from .routers import tasks
 from .core.database import db, migrate
+from .core.settings import get_settings
 
 
-def create_app():
+def create_app(settings):
     new_app = Flask(__name__)
+    new_app.register_blueprint(tasks.blueprint)
     new_app.config["SECRET_KEY"] = settings.SECRET_KEY
     new_app.config["SQLALCHEMY_DATABASE_URI"] = settings.DB_URI
     new_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
@@ -15,7 +15,7 @@ def create_app():
     return new_app
 
 
-app = create_app()
+app = create_app(get_settings())
 
 if __name__ == '__main__':
-    app.run(host=settings.HOST, port=settings.PORT, debug=settings.DEBUG)
+    app.run()
