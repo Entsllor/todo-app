@@ -1,18 +1,16 @@
+from .base import BaseCrud
 from .. import models
 from ..core.database import db
 from ..utils import exceptions
 from ..utils.passwords import get_password_hash
 
 
-class UsersCRUD:
+class UsersCRUD(BaseCrud):
     model = models.User
-
-    def get_one(self, **filters) -> models.User:
-        return self.model.query.filter_by(**filters)
 
     def create(self, login: str, password: str) -> models.User:
         hashed_password = get_password_hash(password)
-        user_with_same_login = self.model.query.filter_by(login=login).first()
+        user_with_same_login = self.get_one({"login": login})
         if user_with_same_login:
             raise exceptions.ExpectedUniqueLogin
         else:

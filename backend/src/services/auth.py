@@ -5,7 +5,7 @@ from ..utils import exceptions
 
 
 def authorize_by_login_and_password(login: str, password: str) -> models.User:
-    user = crud.Users.get_one(login=login).first()
+    user = crud.Users.get_one({'login': login})
     if not user or not user.password_match(plain_password=password):
         raise exceptions.IncorrectLoginOrPassword
     return user

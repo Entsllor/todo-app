@@ -3,7 +3,7 @@ from uuid import UUID
 from flask import Blueprint
 from flask_pydantic import validate
 
-from .. import models
+from .. import models, crud
 from ..core.database import db
 from ..models import AccessToken
 from ..schemas.tasks import TaskOut, TaskCreate, TaskUpdate
@@ -17,7 +17,7 @@ blueprint = Blueprint("tasks", __name__)
 @access_token_required
 @validate(response_many=True)
 def read_tasks(access_token: AccessToken):
-    tasks = models.Task.query.filter_by(user_id=access_token.user_id).all()
+    tasks = crud.Tasks.get_many({'user_id': access_token.user_id})
     return list(map(TaskOut.from_orm, tasks))
 
 
@@ -25,7 +25,7 @@ def read_tasks(access_token: AccessToken):
 @access_token_required
 @validate()
 def read_task(task_id: UUID, access_token: AccessToken):
-    task = models.Task.query.get(task_id)
+    task = crud.Tasks.get_by_id(task_id)
     if task.user_id != access_token.user_id:
         raise exceptions.Forbidden
     return TaskOut.from_orm(task)
@@ -45,7 +45,7 @@ def create_task(body: TaskCreate, access_token: AccessToken):
 @blueprint.post("/tasks/<string:task_id>")
 @access_token_required
 def delete_task(access_token: AccessToken, task_id: UUID):
-    deleted = models.Task.query.filter_by(id=task_id, user_id=access_token.user_id).delete()
+    deleted = crud.Tasks.delete({'id': task_id, 'user_id': access_token.user_id})
     db.session.commit()
     if not deleted:
         raise exceptions.Forbidden
@@ -58,11 +58,9 @@ def delete_task(access_token: AccessToken, task_id: UUID):
 @validate()
 def update_task(body: TaskUpdate, task_id: UUID, access_token: AccessToken):
     # update only if task exists and belongs to current_user
-    db.session.query(models.Task). \
-        filter_by(id=task_id, user_id=access_token.user_id). \
-        update(body.dict(exclude_unset=True))
+    crud.Tasks.update(values=body.dict(exclude_unset=True), filters={'id': task_id, 'user_id': access_token.user_id})
     db.session.flush()
-    task = db.session.query(models.Task).filter_by(id=task_id).first()
+    task = crud.Tasks.get_by_id(task_id)
     if not task:
         raise exceptions.InstanceNotFound
     if task.user_id != access_token.user_id:
