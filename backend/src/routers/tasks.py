@@ -47,8 +47,15 @@ def create_task(body: TaskCreate, access_token: AccessToken):
 @access_token_required
 @validate(on_success_status=200)
 def update_task(body: TaskUpdate, task_id: UUID, access_token: AccessToken):
-    updated = db.session.query(models.Task).filter_by(id=task_id, user_id=access_token.user_id).update(body.dict())
-    db.session.commit()
-    if not updated:
+    # update only if task exists and belongs to current_user
+    db.session.query(models.Task). \
+        filter_by(id=task_id, user_id=access_token.user_id). \
+        update(body.dict(exclude_unset=True))
+    db.session.flush()
+    task = db.session.query(models.Task).filter_by(id=task_id).first()
+    if not task:
+        raise exceptions.InstanceNotFound
+    if task.user_id != access_token.user_id:
         raise exceptions.Forbidden
-    return '', 200
+    db.session.commit()
+    return TaskOut.from_orm(task)

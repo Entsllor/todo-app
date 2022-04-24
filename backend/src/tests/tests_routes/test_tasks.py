@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import pytest
 
 from src import models
+from src.schemas.tasks import TaskOut
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 NEW_TASK_DATA = {
@@ -21,6 +22,7 @@ def test_create_task(client, auth_header):
     assert new_task['description'] == NEW_TASK_DATA['description']
     assert new_task['deadline'] == NEW_TASK_DATA['deadline']
     assert new_task['status'] == 'pending'
+    TaskOut(**response.json)  # validate response body
 
 
 def test_failed_create_task_unauthorized(client):
@@ -94,6 +96,7 @@ def test_update_task(client, tasks, auth_header, default_user):
     assert db_task.title == new_data['title']
     assert db_task.description == new_data['description']
     assert db_task.deadline.strftime(DATETIME_FORMAT) == new_data['deadline']
+    assert TaskOut(**response.json)
 
 
 def test_failed_update_foreign_task(client, tasks, auth_header, second_user):
@@ -126,7 +129,7 @@ def test_failed_update_task_not_found(client, tasks, auth_header, default_user):
         "deadline": (db_task.deadline + timedelta(1)).strftime(DATETIME_FORMAT)
     }
     response = client.put(f"/tasks/{WRONG_UUID}", json=new_data, headers=auth_header)
-    assert response.status_code == 403
+    assert response.status_code == 404
     assert db_task.title != new_data['title']
     assert db_task.description != new_data['description']
     assert db_task.deadline.strftime(DATETIME_FORMAT) != new_data['deadline']
@@ -138,6 +141,7 @@ def test_patch_task(client, tasks, auth_header, default_user):
     response = client.patch(f"/tasks/{db_task.id}", json=new_data, headers=auth_header)
     assert response.status_code == 200, response.text
     assert db_task.title == new_data['title']
+    assert TaskOut(**response.json)
 
 
 def test_failed_patch_foreign_task(client, tasks, auth_header, second_user):
@@ -158,7 +162,7 @@ def test_failed_patch_task_not_found(client, tasks, auth_header, default_user):
     db_task = default_user.tasks[-1]
     new_data = {"title": db_task.title + "__updated"}
     response = client.patch(f"/tasks/{WRONG_UUID}", json=new_data, headers=auth_header)
-    assert response.status_code == 403
+    assert response.status_code == 404
     assert db_task.title != new_data['title']
 
 

@@ -20,7 +20,7 @@ class Task(db.Model):
     description = sa.Column(sa.Text, nullable=True)
     created_at = sa.Column(sa.DateTime, nullable=False, default=datetime.utcnow)
     deadline = sa.Column(sa.DateTime, nullable=True)
-    is_completed = sa.Column(sa.Boolean, default=False)
+    is_completed = sa.Column(sa.Boolean, default=False, nullable=False)
     user_id = sa.Column(UUID(as_uuid=True), sa.ForeignKey("user.id"), nullable=False)
     user = relationship("User", backref="tasks")
 
