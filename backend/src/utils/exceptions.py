@@ -31,6 +31,13 @@ class IncorrectLoginOrPassword(BaseAppException):
     )
 
 
+class AccessTokenRequiredError(BaseAppException):
+    as_http = HTTPException(
+        status_code=401,
+        message="Excepted a JWT access token"
+    )
+
+
 class CredentialsException(BaseAppException):
     as_http = HTTPException(
         status_code=401,

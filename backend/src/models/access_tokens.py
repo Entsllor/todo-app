@@ -1,9 +1,11 @@
 import time
 from typing import NamedTuple
+from uuid import UUID
 
-from jose import jwt
+from jose import jwt, JWTError
 
 from ..core.settings import get_settings
+from ..utils import exceptions
 
 DEFAULT_VALIDATION_OPTIONS = {
     'verify_signature': True,
@@ -82,4 +84,7 @@ class AccessToken(NamedTuple):
 
     def validate(self, **options):
         options = DEFAULT_VALIDATION_OPTIONS.copy() | options
-        jwt.decode(self.body, get_settings().SECRET_KEY, algorithms=[get_settings().JWT_ALGORITHM], options=options)
+        try:
+            jwt.decode(self.body, get_settings().SECRET_KEY, algorithms=[get_settings().JWT_ALGORITHM], options=options)
+        except JWTError:
+            raise exceptions.CredentialsException
