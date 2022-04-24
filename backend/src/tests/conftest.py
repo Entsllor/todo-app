@@ -52,6 +52,6 @@ def session(db) -> Session:
     session.remove()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture
 def client(app, db):
-    return app.test_client(use_cookies=False)
+    return app.test_client(use_cookies=True)

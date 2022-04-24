@@ -1,11 +1,20 @@
-import pytest
+import time
 
-from src import models
+import pytest
+from pydantic import ValidationError
+
+from src import models, crud
+from src.schemas.tokens import AuthTokensOut
 from src.utils.passwords import get_password_hash
 
+SIGN_UP_URL = '/sign-up'
+LOGIN_URL = '/login'
+REVOKE_URL = "/revoke"
+DEFAULT_USER_PASSWORD = "default_password"
+DEFAULT_USER_LOGIN = "DEFAULT_USERNAME"
 USER_CREATE_DATA = {
-    'login': 'DEFAULT_USERNAME',
-    'password': "default_password"
+    'login': DEFAULT_USER_LOGIN,
+    'password': DEFAULT_USER_PASSWORD
 }
 
 
@@ -33,6 +42,72 @@ def default_user(session):
     return user
 
 
-def test_failed_create_user_not_unique_username(client, default_user):
-    response = client.post('/sign-up', json=USER_CREATE_DATA)
+@pytest.fixture
+def token_pair(default_user):
+    refresh_token = crud.RefreshTokens.create(user_id=default_user.id)
+    access_token = crud.AccessTokens.create(user_id=default_user.id)
+    return AuthTokensOut(
+        expires_in=access_token.expire_at,
+        access_token=access_token.body,
+        refresh_token=refresh_token.body
+    )
+
+
+def test_failed_create_user_not_unique_login(client, default_user):
+    response = client.post(SIGN_UP_URL, json=USER_CREATE_DATA)
     assert response.status_code == 400, response.text
+
+
+def test_login(default_user, client):
+    response = client.post(
+        LOGIN_URL,
+        json={'login': default_user.login, 'password': DEFAULT_USER_PASSWORD},
+    )
+    assert response.status_code == 200, response.text
+    assert AuthTokensOut(**response.json)  # validate response content
+
+
+def test_failed_login_wrong_password(default_user, client):
+    response = client.post(LOGIN_URL, json={'login': default_user.login, 'password': "__WRONG_PASSWORD"})
+    assert response.status_code == 401, response.text
+    with pytest.raises(ValidationError):
+        assert AuthTokensOut(**response.json)  # validate response content
+
+
+def test_failed_login_user_does_not_exist(default_user, client):
+    response = client.post(LOGIN_URL, json={'login': "__WRONG_USERNAME", 'password': DEFAULT_USER_PASSWORD})
+    assert response.status_code == 401, response.text
+    with pytest.raises(ValidationError):
+        assert AuthTokensOut(**response.json)  # validate response content
+
+
+def test_revoke_tokens(client, token_pair, default_user):
+    client.set_cookie('test', "refresh_token", token_pair.refresh_token)
+    client.set_cookie('test', "client_id", str(default_user.id))
+    response = client.post(REVOKE_URL, json=token_pair.dict())
+    assert response.status_code == 200, response.text
+    assert AuthTokensOut(**response.json)
+
+
+def test_failed_revoke_tokens_if_refresh_token_expired(client, token_pair, default_user):
+    client.set_cookie('test', "refresh_token", token_pair.refresh_token)
+    client.set_cookie('test', "client_id", str(default_user.id))
+    crud.RefreshTokens.change_expire_term(default_user.id, token_pair.refresh_token, time.time() - 100)
+    response = client.post(REVOKE_URL, json=token_pair.dict())
+    assert response.status_code == 401, response.text
+
+
+def test_failed_revoke_tokens_if_refresh_token_invalid(client, token_pair, default_user):
+    client.set_cookie('test', "refresh_token", token_pair.refresh_token + "_invalid")
+    client.set_cookie('test', "client_id", str(default_user.id))
+    crud.RefreshTokens.change_expire_term(default_user.id, token_pair.refresh_token, time.time() - 100)
+    response = client.post(REVOKE_URL, json=token_pair.dict())
+    assert response.status_code == 401, response.text
+
+
+def test_failed_revoke_tokens_if_refresh_token_belongs_to_another_user(client, token_pair):
+    another_user = crud.Users.create(login="ANOTHER_USER", password="Another_Password")
+    client.set_cookie('test', "refresh_token", token_pair.refresh_token + "_invalid")
+    client.set_cookie('test', "client_id", str(another_user.id))
+    response = client.post(REVOKE_URL, json=token_pair.dict())
+    assert response.status_code == 401, response.text

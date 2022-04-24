@@ -1,9 +1,11 @@
+import uuid
 from datetime import datetime
 
-from src.core.database import db
 import sqlalchemy as sa
-import uuid
 from sqlalchemy.dialects.postgresql import UUID
+
+from ..core.database import db
+from ..utils.passwords import verify_password
 
 
 class User(db.Model):
@@ -11,3 +13,6 @@ class User(db.Model):
     login = sa.Column(sa.String(length=255), index=True, unique=True)
     created_at = sa.Column(sa.DateTime, default=datetime.utcnow)
     hashed_password = sa.Column(sa.String(length=255))
+
+    def password_match(self, plain_password: str) -> bool:
+        return verify_password(plain_password=plain_password, hashed_password=self.hashed_password)
