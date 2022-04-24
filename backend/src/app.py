@@ -1,6 +1,7 @@
 from flask import Flask
 
 from src.utils import exceptions
+from src.utils.filling_db import fill_db, clear_db
 from .core.database import db, migrate
 from .core.settings import get_settings
 from .routers import tasks, users
@@ -22,6 +23,8 @@ def create_app(settings):
 
 
 app = create_app(get_settings())
+app.cli.command('fill_db')(fill_db)
+app.cli.command('clear_db')(clear_db)
 
 if __name__ == '__main__':
     app.run()
