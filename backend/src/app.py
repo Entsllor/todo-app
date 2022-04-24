@@ -20,7 +20,7 @@ def create_app(settings):
     new_app.register_error_handler(exceptions.BaseAppException, exceptions.handle_app_exception)
     db.init_app(new_app)
     migrate.init_app(new_app, db, directory=settings.ALEMBIC_PATH)
-    CORS(app, supports_credentials=True, origins=settings.ALLOWED_ORIGINS)
+    CORS(new_app, supports_credentials=True, origins=settings.ALLOWED_ORIGINS)
     return new_app
 
 
