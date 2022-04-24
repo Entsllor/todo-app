@@ -6,6 +6,7 @@ from src import models
 from src.schemas.tasks import TaskOut
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
+TASKS_URL = 'api/tasks/'
 NEW_TASK_DATA = {
     'title': "NEW_TASK",
     'description': "DESCRIPTION",
@@ -15,7 +16,7 @@ WRONG_UUID = "00000000-0000-0000-0000-000000000000"
 
 
 def test_create_task(client, auth_header):
-    response = client.post("/tasks/", json=NEW_TASK_DATA, headers=auth_header)
+    response = client.post(f"{TASKS_URL}", json=NEW_TASK_DATA, headers=auth_header)
     new_task = response.json
     assert response.status_code == 201, response.text
     assert new_task['title'] == NEW_TASK_DATA['title']
@@ -26,7 +27,7 @@ def test_create_task(client, auth_header):
 
 
 def test_failed_create_task_unauthorized(client):
-    response = client.post("/tasks/", json=NEW_TASK_DATA)
+    response = client.post(f"{TASKS_URL}", json=NEW_TASK_DATA)
     assert response.status_code == 401, response.text
 
 
@@ -47,7 +48,7 @@ def tasks(session, default_user, second_user):
 
 
 def test_read_tasks(client, tasks, auth_header, default_user):
-    response = client.get("/tasks/", headers=auth_header)
+    response = client.get(f"{TASKS_URL}", headers=auth_header)
     assert len(tasks) != len(default_user.tasks)
     assert response.status_code == 200, response.text
     tasks_from_response = response.json
@@ -58,13 +59,13 @@ def test_read_tasks(client, tasks, auth_header, default_user):
 
 
 def test_read_tasks_unauthorized(client, tasks):
-    response = client.get("/tasks/")
+    response = client.get(f"{TASKS_URL}")
     assert response.status_code == 401, response.text
 
 
 def test_read_task(client, tasks, auth_header, default_user):
     task = default_user.tasks[-1]
-    response = client.get(f"/tasks/{task.id}", headers=auth_header)
+    response = client.get(f"{TASKS_URL}{task.id}", headers=auth_header)
     assert response.status_code == 200, response.text
     task_from_response = response.json
     assert task_from_response['title'] == task.title
@@ -75,12 +76,12 @@ def test_read_task(client, tasks, auth_header, default_user):
 
 def test_failed_read_foreign_task(client, tasks, auth_header, second_user):
     task = second_user.tasks[-1]
-    response = client.get(f"/tasks/{task.id}", headers=auth_header)
+    response = client.get(f"{TASKS_URL}{task.id}", headers=auth_header)
     assert response.status_code == 403, response.text
 
 
 def test_read_task_unauthorized(client, tasks):
-    response = client.get(f"/tasks/{tasks[-1].id}")
+    response = client.get(f"{TASKS_URL}{tasks[-1].id}")
     assert response.status_code == 401, response.text
 
 
@@ -91,7 +92,7 @@ def test_update_task(client, tasks, auth_header, default_user):
         "description": db_task.description + "__updated",
         "deadline": (db_task.deadline + timedelta(1)).strftime(DATETIME_FORMAT)
     }
-    response = client.put(f"/tasks/{db_task.id}", json=new_data, headers=auth_header)
+    response = client.put(f"{TASKS_URL}{db_task.id}", json=new_data, headers=auth_header)
     assert response.status_code == 200, response.text
     assert db_task.title == new_data['title']
     assert db_task.description == new_data['description']
@@ -106,7 +107,7 @@ def test_failed_update_foreign_task(client, tasks, auth_header, second_user):
         "description": db_task.description + "__updated",
         "deadline": (db_task.deadline + timedelta(1)).strftime(DATETIME_FORMAT)
     }
-    response = client.put(f"/tasks/{db_task.id}", json=new_data, headers=auth_header)
+    response = client.put(f"{TASKS_URL}{db_task.id}", json=new_data, headers=auth_header)
     assert response.status_code == 403, response.text
 
 
@@ -117,7 +118,7 @@ def test_failed_update_task_unauthorized(client, tasks, default_user):
         "description": db_task.description + "__updated",
         "deadline": (db_task.deadline + timedelta(1)).strftime(DATETIME_FORMAT)
     }
-    response = client.put(f"/tasks/{db_task.id}", json=new_data)
+    response = client.put(f"{TASKS_URL}{db_task.id}", json=new_data)
     assert response.status_code == 401, response.text
 
 
@@ -128,7 +129,7 @@ def test_failed_update_task_not_found(client, tasks, auth_header, default_user):
         "description": db_task.description + "__updated",
         "deadline": (db_task.deadline + timedelta(1)).strftime(DATETIME_FORMAT)
     }
-    response = client.put(f"/tasks/{WRONG_UUID}", json=new_data, headers=auth_header)
+    response = client.put(f"{TASKS_URL}{WRONG_UUID}", json=new_data, headers=auth_header)
     assert response.status_code == 404
     assert db_task.title != new_data['title']
     assert db_task.description != new_data['description']
@@ -138,7 +139,7 @@ def test_failed_update_task_not_found(client, tasks, auth_header, default_user):
 def test_patch_task(client, tasks, auth_header, default_user):
     db_task = default_user.tasks[-1]
     new_data = {"title": db_task.title + "__updated"}
-    response = client.patch(f"/tasks/{db_task.id}", json=new_data, headers=auth_header)
+    response = client.patch(f"{TASKS_URL}{db_task.id}", json=new_data, headers=auth_header)
     assert response.status_code == 200, response.text
     assert db_task.title == new_data['title']
     assert TaskOut(**response.json)
@@ -147,21 +148,21 @@ def test_patch_task(client, tasks, auth_header, default_user):
 def test_failed_patch_foreign_task(client, tasks, auth_header, second_user):
     db_task = second_user.tasks[-1]
     new_data = {"title": db_task.title + "__updated"}
-    response = client.patch(f"/tasks/{db_task.id}", json=new_data, headers=auth_header)
+    response = client.patch(f"{TASKS_URL}{db_task.id}", json=new_data, headers=auth_header)
     assert response.status_code == 403, response.text
 
 
 def test_failed_patch_task_unauthorized(client, tasks, default_user):
     db_task = default_user.tasks[-1]
     new_data = {"title": db_task.title + "__updated"}
-    response = client.patch(f"/tasks/{db_task.id}", json=new_data)
+    response = client.patch(f"{TASKS_URL}{db_task.id}", json=new_data)
     assert response.status_code == 401, response.text
 
 
 def test_failed_patch_task_not_found(client, tasks, auth_header, default_user):
     db_task = default_user.tasks[-1]
     new_data = {"title": db_task.title + "__updated"}
-    response = client.patch(f"/tasks/{WRONG_UUID}", json=new_data, headers=auth_header)
+    response = client.patch(f"{TASKS_URL}{WRONG_UUID}", json=new_data, headers=auth_header)
     assert response.status_code == 404
     assert db_task.title != new_data['title']
 
@@ -170,7 +171,7 @@ def test_patch_set_task_completed(client, tasks, auth_header, default_user):
     db_task = default_user.tasks[-1]
     assert not db_task.is_completed
     new_data = {"is_completed": True}
-    response = client.patch(f"/tasks/{db_task.id}", json=new_data, headers=auth_header)
+    response = client.patch(f"{TASKS_URL}{db_task.id}", json=new_data, headers=auth_header)
     assert response.status_code == 200, response.text
     assert db_task.is_completed
     assert db_task.status == 'completed'

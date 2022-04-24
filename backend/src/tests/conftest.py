@@ -13,6 +13,16 @@ TESTDB = 'test_project.db'
 TESTDB_PATH = "/opt/project/data/{}".format(TESTDB)
 TEST_DATABASE_URI = 'sqlite:///' + TESTDB_PATH
 
+SIGN_UP_URL = 'api/sign-up'
+LOGIN_URL = 'api/login'
+REVOKE_URL = "api/revoke"
+DEFAULT_USER_PASSWORD = "default_password"
+DEFAULT_USER_LOGIN = "DEFAULT_USERNAME"
+USER_CREATE_DATA = {
+    'login': DEFAULT_USER_LOGIN,
+    'password': DEFAULT_USER_PASSWORD
+}
+
 
 @pytest.fixture(scope='session')
 def app():
@@ -95,14 +105,3 @@ def token_pair(default_user, access_token) -> AuthTokensOut:
         access_token=access_token.body,
         refresh_token=refresh_token.body
     )
-
-
-SIGN_UP_URL = '/sign-up'
-LOGIN_URL = '/login'
-REVOKE_URL = "/revoke"
-DEFAULT_USER_PASSWORD = "default_password"
-DEFAULT_USER_LOGIN = "DEFAULT_USERNAME"
-USER_CREATE_DATA = {
-    'login': DEFAULT_USER_LOGIN,
-    'password': DEFAULT_USER_PASSWORD
-}

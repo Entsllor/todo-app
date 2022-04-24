@@ -8,9 +8,8 @@ from src.schemas.tokens import AuthTokensOut
 from src.tests.conftest import SIGN_UP_URL, LOGIN_URL, REVOKE_URL, DEFAULT_USER_PASSWORD, USER_CREATE_DATA
 
 
-
 def test_create_user(client, session):
-    response = client.post('/sign-up', json=USER_CREATE_DATA)
+    response = client.post(SIGN_UP_URL, json=USER_CREATE_DATA)
     assert response.status_code == 201, response.text
     created_user = response.json
     assert created_user['login'] == USER_CREATE_DATA['login']

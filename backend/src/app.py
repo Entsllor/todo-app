@@ -8,8 +8,8 @@ from .routers import tasks, users
 
 def create_app(settings):
     new_app = Flask(__name__)
-    new_app.register_blueprint(tasks.blueprint)
-    new_app.register_blueprint(users.blueprint)
+    new_app.register_blueprint(tasks.blueprint, url_prefix='/api')
+    new_app.register_blueprint(users.blueprint, url_prefix='/api')
     new_app.config["SECRET_KEY"] = settings.SECRET_KEY
     new_app.config["SQLALCHEMY_DATABASE_URI"] = settings.DB_URI
     new_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
