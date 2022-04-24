@@ -71,8 +71,8 @@ class AccessToken(NamedTuple):
         return payload.get("sub")
 
     @property
-    def user_id(self) -> int:
-        return int(self.sub)
+    def user_id(self) -> UUID:
+        return UUID(self.sub)
 
     @property
     def expire_at(self) -> float:

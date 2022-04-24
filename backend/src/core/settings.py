@@ -8,6 +8,8 @@ BASE_PATH = Path(__file__).parent.parent
 
 
 class AppSettings(BaseSettings):
+    DEBUG: bool = False
+    TESTING: bool = False
     DB_URI: str
     SECRET_KEY: str = "YOUR SECRET KEY"
     JWT_ALGORITHM: str = "HS256"
@@ -22,6 +24,7 @@ class AppSettings(BaseSettings):
 
 
 class DevSettings(AppSettings):
+    DEBUG: bool = True
     DB_URI = "postgresql://user:pass@localhost:5432/postgres"
 
     class Config:
@@ -30,6 +33,8 @@ class DevSettings(AppSettings):
 
 
 class TestSettings(AppSettings):
+    DEBUG: bool = True
+    TESTING: bool = True
     DB_URI: str = "postgresql://user:pass@localhost:5432/test_db"
 
     class Config:
