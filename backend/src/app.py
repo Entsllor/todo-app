@@ -1,7 +1,9 @@
 from flask import Flask
-from .routers import tasks, users
+
+from src.utils import exceptions
 from .core.database import db, migrate
 from .core.settings import get_settings
+from .routers import tasks, users
 
 
 def create_app(settings):
@@ -11,6 +13,7 @@ def create_app(settings):
     new_app.config["SECRET_KEY"] = settings.SECRET_KEY
     new_app.config["SQLALCHEMY_DATABASE_URI"] = settings.DB_URI
     new_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
+    new_app.register_error_handler(exceptions.BaseAppException, exceptions.handle_app_exception)
     db.init_app(new_app)
     migrate.init_app(new_app, db, directory=settings.ALEMBIC_PATH)
     return new_app
