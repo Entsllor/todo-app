@@ -17,6 +17,7 @@ class AppSettings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_SECONDS: int = 60 * 60 * 24 * 30
     ALEMBIC_PATH: Path | str = BASE_PATH.parent.joinpath("migrations")
     PASSWORD_HASHING_SCHEMAS: list = ['scrypt']
+    ALLOWED_ORIGINS: tuple[str] = ('http://localhost:3000', 'https://localhost:3000')
 
     class Config:
         env_file = BASE_PATH.joinpath(".env")
