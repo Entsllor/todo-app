@@ -1,32 +1,41 @@
 from uuid import UUID
 
+from flask import Blueprint
 from flask_pydantic import validate
-from flask import Blueprint, abort
+
 from .. import models
-from ..schemas.tasks import TaskOut, TaskCreate, TaskUpdate
 from ..core.database import db
+from ..models import AccessToken
+from ..schemas.tasks import TaskOut, TaskCreate, TaskUpdate
+from ..utils import exceptions
+from ..utils.tokens import access_token_required
 
 blueprint = Blueprint("tasks", __name__)
 
 
 @blueprint.get("/tasks/")
+@access_token_required
 @validate(response_many=True)
-def read_tasks():
-    tasks = models.Task.query.all()
+def read_tasks(access_token: AccessToken):
+    tasks = models.Task.query.filter_by(user_id=access_token.user_id).all()
     return list(map(TaskOut.from_orm, tasks))
 
 
 @blueprint.get("/tasks/<string:task_id>")
+@access_token_required
 @validate()
-def read_task(task_id: UUID):
+def read_task(task_id: UUID, access_token: AccessToken):
     task = models.Task.query.get(task_id)
+    if task.user_id != access_token.user_id:
+        raise exceptions.Forbidden
     return TaskOut.from_orm(task)
 
 
 @blueprint.post("/tasks/")
+@access_token_required
 @validate(on_success_status=201)
-def create_task(body: TaskCreate):
-    db_task = models.Task(**body.dict())
+def create_task(body: TaskCreate, access_token: AccessToken):
+    db_task = models.Task(**body.dict(), user_id=access_token.user_id)
     db.session.add(db_task)
     db.session.commit()
     db.session.refresh(db_task)
@@ -35,10 +44,11 @@ def create_task(body: TaskCreate):
 
 @blueprint.put("/tasks/<string:task_id>")
 @blueprint.patch("/tasks/<string:task_id>")
+@access_token_required
 @validate(on_success_status=200)
-def update_task(body: TaskUpdate, task_id: UUID):
-    updated = db.session.query(models.Task).filter_by(id=task_id).update(body.dict())
+def update_task(body: TaskUpdate, task_id: UUID, access_token: AccessToken):
+    updated = db.session.query(models.Task).filter_by(id=task_id, user_id=access_token.user_id).update(body.dict())
     db.session.commit()
     if not updated:
-        abort(404)
+        raise exceptions.Forbidden
     return '', 200

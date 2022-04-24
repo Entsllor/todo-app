@@ -5,17 +5,8 @@ from pydantic import ValidationError
 
 from src import models, crud
 from src.schemas.tokens import AuthTokensOut
-from src.utils.passwords import get_password_hash
+from src.tests.conftest import SIGN_UP_URL, LOGIN_URL, REVOKE_URL, DEFAULT_USER_PASSWORD, USER_CREATE_DATA
 
-SIGN_UP_URL = '/sign-up'
-LOGIN_URL = '/login'
-REVOKE_URL = "/revoke"
-DEFAULT_USER_PASSWORD = "default_password"
-DEFAULT_USER_LOGIN = "DEFAULT_USERNAME"
-USER_CREATE_DATA = {
-    'login': DEFAULT_USER_LOGIN,
-    'password': DEFAULT_USER_PASSWORD
-}
 
 
 def test_create_user(client, session):
@@ -30,27 +21,6 @@ def test_create_user(client, session):
     assert not (created_user.get('password') or created_user.get('hashed_password'))
     assert created_user['id']
     assert created_user['created_at']
-
-
-@pytest.fixture
-def default_user(session):
-    hashed_password = get_password_hash(USER_CREATE_DATA['password'])
-    user = models.User(login=USER_CREATE_DATA['login'], hashed_password=hashed_password)
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-    return user
-
-
-@pytest.fixture
-def token_pair(default_user):
-    refresh_token = crud.RefreshTokens.create(user_id=default_user.id)
-    access_token = crud.AccessTokens.create(user_id=default_user.id)
-    return AuthTokensOut(
-        expires_in=access_token.expire_at,
-        access_token=access_token.body,
-        refresh_token=refresh_token.body
-    )
 
 
 def test_failed_create_user_not_unique_login(client, default_user):

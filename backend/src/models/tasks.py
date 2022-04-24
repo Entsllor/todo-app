@@ -1,10 +1,12 @@
 import enum
 import uuid
+from datetime import datetime
 
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
+
 from ..core.database import db
-from datetime import datetime
 
 
 class TaskStatusEnum(enum.Enum):
@@ -19,6 +21,8 @@ class Task(db.Model):
     created_at = sa.Column(sa.DateTime, nullable=False, default=datetime.utcnow)
     deadline = sa.Column(sa.DateTime, nullable=True)
     is_completed = sa.Column(sa.Boolean, default=False)
+    user_id = sa.Column(UUID(as_uuid=True), sa.ForeignKey("user.id"), nullable=False)
+    user = relationship("User", backref="tasks")
 
     @property
     def is_expired(self):

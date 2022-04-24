@@ -36,6 +36,7 @@ class TestSettings(AppSettings):
     DEBUG: bool = True
     TESTING: bool = True
     DB_URI: str = "postgresql://user:pass@localhost:5432/test_db"
+    PASSWORD_HASHING_SCHEMAS: list = ['md5_crypt']
 
     class Config:
         env_file = BASE_PATH.joinpath(".env")

@@ -1,10 +1,13 @@
 import os
+
 import pytest
 from sqlalchemy.orm import Session
 
+from src import crud
 from src.app import create_app
 from src.core.database import db as _db
 from src.core.settings import get_settings
+from src.schemas.tokens import AuthTokensOut
 
 TESTDB = 'test_project.db'
 TESTDB_PATH = "/opt/project/data/{}".format(TESTDB)
@@ -55,3 +58,51 @@ def session(db) -> Session:
 @pytest.fixture
 def client(app, db):
     return app.test_client(use_cookies=True)
+
+
+@pytest.fixture
+def default_user(session):
+    user = crud.Users.create(login=USER_CREATE_DATA['login'], password=USER_CREATE_DATA['password'])
+    session.commit()
+    session.refresh(user)
+    return user
+
+
+@pytest.fixture
+def second_user(session):
+    second_user = crud.Users.create(login="SECOND_LOGIN", password="SECOND_PASSWORD")
+    session.commit()
+    session.refresh(second_user)
+    return second_user
+
+
+@pytest.fixture
+def access_token(default_user):
+    return crud.AccessTokens.create(user_id=default_user.id)
+
+
+@pytest.fixture
+def auth_header(access_token) -> dict[str, str]:
+    """return authorization header for default user"""
+    return {"Authorization": f"Bearer {access_token.body}"}
+
+
+@pytest.fixture
+def token_pair(default_user, access_token) -> AuthTokensOut:
+    refresh_token = crud.RefreshTokens.create(user_id=default_user.id)
+    return AuthTokensOut(
+        expires_in=access_token.expire_at,
+        access_token=access_token.body,
+        refresh_token=refresh_token.body
+    )
+
+
+SIGN_UP_URL = '/sign-up'
+LOGIN_URL = '/login'
+REVOKE_URL = "/revoke"
+DEFAULT_USER_PASSWORD = "default_password"
+DEFAULT_USER_LOGIN = "DEFAULT_USERNAME"
+USER_CREATE_DATA = {
+    'login': DEFAULT_USER_LOGIN,
+    'password': DEFAULT_USER_PASSWORD
+}
