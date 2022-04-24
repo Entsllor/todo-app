@@ -11,8 +11,11 @@ from ..core.settings import get_settings
 class RefreshTokenCRUD:
     model = models.RefreshToken
 
+    def delete(self, **filters):
+        return self.model.query.filter_by(**filters).delete()
+
     def create(self, user_id, expire_delta: int = None) -> models.RefreshToken:
-        self.model.query.where(self.model.user_id == user_id).delete()
+        self.delete(user_id=user_id)
         if expire_delta is None:
             expire_delta = get_settings().REFRESH_TOKEN_EXPIRE_SECONDS
         expire_at = time.time() + expire_delta

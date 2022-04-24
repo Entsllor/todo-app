@@ -13,9 +13,10 @@ TESTDB = 'test_project.db'
 TESTDB_PATH = "/opt/project/data/{}".format(TESTDB)
 TEST_DATABASE_URI = 'sqlite:///' + TESTDB_PATH
 
-SIGN_UP_URL = 'api/sign-up'
-LOGIN_URL = 'api/login'
-REVOKE_URL = "api/revoke"
+SIGN_UP_URL = 'api/auth/sign-up'
+LOGIN_URL = 'api/auth/login'
+LOGOUT_URL = 'api/auth/logout'
+REVOKE_URL = "api/auth/revoke"
 DEFAULT_USER_PASSWORD = "default_password"
 DEFAULT_USER_LOGIN = "DEFAULT_USERNAME"
 USER_CREATE_DATA = {
