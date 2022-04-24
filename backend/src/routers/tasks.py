@@ -42,10 +42,20 @@ def create_task(body: TaskCreate, access_token: AccessToken):
     return TaskOut.from_orm(db_task)
 
 
+@blueprint.post("/tasks/<string:task_id>")
+@access_token_required
+def delete_task(access_token: AccessToken, task_id: UUID):
+    deleted = models.Task.query.filter_by(id=task_id, user_id=access_token.user_id).delete()
+    db.session.commit()
+    if not deleted:
+        raise exceptions.Forbidden
+    return "", 204
+
+
 @blueprint.put("/tasks/<string:task_id>")
 @blueprint.patch("/tasks/<string:task_id>")
 @access_token_required
-@validate(on_success_status=200)
+@validate()
 def update_task(body: TaskUpdate, task_id: UUID, access_token: AccessToken):
     # update only if task exists and belongs to current_user
     db.session.query(models.Task). \
