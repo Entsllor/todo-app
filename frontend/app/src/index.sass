@@ -1,0 +1,33 @@
+@import "bootstrap/scss/bootstrap"
+
+$main-bg-color: #95e08c
+$table-card-bg: #F3D9B6
+
+
+body
+  margin: 0
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif
+  -webkit-font-smoothing: antialiased
+  -moz-osx-font-smoothing: grayscale
+  background-color: $main-bg-color
+
+
+code
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace
+
+.TableWrapper
+  margin-top: 1em
+  text-align: center
+
+.main-card-title
+  @extend .card-header
+  @extend .text-light
+  text-align: center
+  background-color: $dark
+
+.AuthForm
+  margin-top: 1em
+
+.main-container
+  @extend .container-fluid
+  @extend .w-100
