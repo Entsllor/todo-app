@@ -34,7 +34,7 @@ def logout():
             raise ValueError
     except (ValueError, TypeError):
         raise exceptions.CredentialsException
-    assert crud.RefreshTokens.delete({'body': refresh_token, 'user_id': user_id})
+    crud.RefreshTokens.delete({'body': refresh_token, 'user_id': user_id})
     response = make_response("", 204)
     response.set_cookie(
         key="refresh_token",
