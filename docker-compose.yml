@@ -25,13 +25,13 @@ services:
     ports:
       - "5000:5000"
 
-#  frontend:
-#    build:
-#      context: frontend
-#      dockerfile: Dockerfile
-#    stdin_open: true
-#    ports:
-#      - "3000:3000"
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    stdin_open: true
+    ports:
+      - "3000:3000"
 
 volumes:
   db-data:

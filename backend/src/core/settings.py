@@ -1,8 +1,8 @@
 import os
+from pathlib import Path
 from typing import Literal
 
 from pydantic import BaseSettings
-from pathlib import Path
 
 BASE_PATH = Path(__file__).parent.parent
 
@@ -44,11 +44,18 @@ class TestSettings(AppSettings):
         env_prefix = "APP_TEST_"
 
 
+_test_settings = TestSettings()
+_dev_settings = DevSettings()
+_prod_settings = AppSettings()
+
+
 def get_settings(mode: Literal['testings', 'development', 'production'] = None):
     if mode is None:
         mode = os.getenv("FLASK_ENV", "development").lower()
     match mode:
         case "testing":
-            return TestSettings()
+            return _test_settings
+        case "production":
+            return _prod_settings
         case _:
-            return DevSettings()
+            return _dev_settings
