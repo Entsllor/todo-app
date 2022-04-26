@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import TableInner from "../table/TableInner"
 import {ITask} from "../../interfaces";
 import TasksService from "../../services/tasksService";
-
+import TaskForm from "../task_form/TaskForm"
 
 const TableWrapper: React.FC = () => {
     const [tasks, setTasks] = useState<ITask[]>([]);
@@ -21,6 +21,7 @@ const TableWrapper: React.FC = () => {
         <div className="card">
             <div className="main-card-title">Main Table</div>
             <TableInner tasks={tasks}/>
+            <TaskForm updater={updateTasks}/>
         </div>
     </div>
 };
