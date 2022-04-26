@@ -27,6 +27,7 @@ export default class AuthService {
     }
 
     static async logout(): Promise<AxiosResponse<void>> {
+        localStorage.removeItem("JWT")
         return api.post("auth/logout")
     }
 }
