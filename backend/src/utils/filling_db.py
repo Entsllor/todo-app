@@ -21,7 +21,7 @@ def fill_db():
     user_2 = crud.Users.create("user_2", "pass")
     user_3 = crud.Users.create("user_3", "pass")
     db.session.add_all([user_1, user_2, user_3])
-    db.session.commit()
+    db.session.flush()
     deadline_generator = get_deadline_generator()
     user_1_tasks = [
         models.Task(user_id=user_1.id, title="Шок", deadline=next(deadline_generator), is_completed=True),
