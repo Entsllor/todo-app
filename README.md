@@ -37,3 +37,18 @@ Run this project by docker-compose
 ```shell
 docker-compose up --build
 ```
+
+## Utils
+
+You can fill db with test data by command
+
+```shell
+flask fill_db
+```
+
+Also, you can clear db by command
+
+```shell
+flask clear_db
+```
+
