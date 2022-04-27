@@ -52,7 +52,7 @@ const TableInner: React.FC<{ tasks: ITask[], updater: CallableFunction; }> = (pr
                                         type="checkbox"
                                     />
                                 </td>
-                                <td>{task.title}</td>
+                                <td title={task.description}>{task.title}</td>
                                 <td>{task.deadline}</td>
                                 <td>
                                     <button
