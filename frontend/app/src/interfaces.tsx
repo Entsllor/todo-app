@@ -4,5 +4,5 @@ export interface ITask {
     description: string;
     deadline: string;
     status: string;
-    isCompleted: boolean;
+    is_completed: boolean;
 }

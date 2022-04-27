@@ -10,6 +10,11 @@ const TableInner: React.FC<{ tasks: ITask[], updater: CallableFunction; }> = (pr
         props.updater()
     }
 
+    const setTaskStatus = async (taskID: string, newStatus: boolean = true) => {
+        await TasksService.updateTask(taskID, {is_completed: newStatus}).catch(() => alert("Failed to update"));
+        props.updater()
+    }
+
     return (
         <div className="Table">
             <div style={{overflowX: "auto"}}>
@@ -17,13 +22,13 @@ const TableInner: React.FC<{ tasks: ITask[], updater: CallableFunction; }> = (pr
                     <thead>
                     <tr>
                         <th>
+                            Completed
+                        </th>
+                        <th>
                             Title
                         </th>
                         <th>
                             Deadline
-                        </th>
-                        <th>
-                            Status
                         </th>
                         <th>
                             Delete
@@ -31,20 +36,33 @@ const TableInner: React.FC<{ tasks: ITask[], updater: CallableFunction; }> = (pr
                     </tr>
                     </thead>
                     <tbody>
-                    {tasks.map(task =>
-                        <tr key={task.id}>
-                            <td>{task.title}</td>
-                            <td>{task.deadline}</td>
-                            <td>{task.status}</td>
-                            <td>
-                                <button
-                                    onClick={() => deleteTask(task.id)}
-                                    className="btn btn-danger btn-sm">
-                                    X
-                                </button>
-                            </td>
-                        </tr>
-                    )}
+                    {tasks
+                        .sort((a, b) => {
+                            if (a.is_completed === b.is_completed)
+                                return a.deadline.localeCompare(b.deadline);
+                            return a.is_completed ? 1 : -1
+                        })
+                        .map(task =>
+                            <tr key={task.id} className={task.is_completed? "text-secondary": ""}>
+                                <td>
+                                    <input
+                                        className="form-check-input"
+                                        checked={task.is_completed}
+                                        onInput={() => setTaskStatus(task.id, !task.is_completed)}
+                                        type="checkbox"
+                                    />
+                                </td>
+                                <td>{task.title}</td>
+                                <td>{task.deadline}</td>
+                                <td>
+                                    <button
+                                        onClick={() => deleteTask(task.id)}
+                                        className="btn btn-danger btn-sm">
+                                        X
+                                    </button>
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
