@@ -15,7 +15,7 @@ Create ./backend/app/.env file and set env variables
 ```dotenv
 # backend/app/.env
 FLASK_ENV=production
-APP_DB_URI=postgresql+asyncpg://USERNAME:PASSWORD@localhost:5432/postgres
+APP_DB_URI=postgresql://user:pass@db:5432/postgres
 APP_SECRET_KEY=YOUR-SECRET-KEY
 ```
 
