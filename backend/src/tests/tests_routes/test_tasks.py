@@ -181,24 +181,24 @@ def test_patch_set_task_completed(client, tasks, auth_header, default_user):
 
 def test_delete_task(client, tasks, auth_header, default_user, session):
     db_task = default_user.tasks[-1]
-    response = client.post(TASK_URL.format(db_task.id), headers=auth_header)
+    response = client.delete(TASK_URL.format(db_task.id), headers=auth_header)
     assert response.status_code == 204
     with pytest.raises(ObjectDeletedError):
         assert db_task.id
 
 
 def test_failed_delete_task_not_found(client, tasks, auth_header, default_user):
-    response = client.post(TASK_URL.format(WRONG_UUID), headers=auth_header)
+    response = client.delete(TASK_URL.format(WRONG_UUID), headers=auth_header)
     assert response.status_code == 403
 
 
 def test_failed_delete_foreign_task(client, tasks, auth_header, second_user):
     db_task = second_user.tasks[-1]
-    response = client.post(TASK_URL.format(db_task.id), headers=auth_header)
+    response = client.delete(TASK_URL.format(db_task.id), headers=auth_header)
     assert response.status_code == 403
 
 
 def test_failed_delete_task_unauthorized(client, tasks, default_user):
     db_task = default_user.tasks[-1]
-    response = client.post(TASK_URL.format(db_task.id))
+    response = client.delete(TASK_URL.format(db_task.id))
     assert response.status_code == 401

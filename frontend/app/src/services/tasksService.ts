@@ -17,4 +17,12 @@ export default class TasksService {
             {headers: {"Authorization": `Bearer ${localStorage.getItem("JWT")}`}}
         );
     }
+
+    static async deleteTask(taskID: string): Promise<AxiosResponse> {
+        return api.delete(
+            `tasks/${taskID}`,
+            {headers: {"Authorization": `Bearer ${localStorage.getItem("JWT")}`}}
+        );
+    }
+
 }

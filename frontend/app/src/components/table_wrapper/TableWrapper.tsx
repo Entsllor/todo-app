@@ -20,7 +20,7 @@ const TableWrapper: React.FC = () => {
     return <div className="TableWrapper">
         <div className="card">
             <div className="main-card-title">Main Table</div>
-            <TableInner tasks={tasks}/>
+            <TableInner updater={updateTasks} tasks={tasks}/>
             <TaskForm updater={updateTasks}/>
         </div>
     </div>

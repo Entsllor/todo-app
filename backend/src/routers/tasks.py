@@ -42,7 +42,7 @@ def create_task(body: TaskCreate, access_token: AccessToken):
     return TaskOut.from_orm(db_task)
 
 
-@blueprint.post("/tasks/<string:task_id>")
+@blueprint.delete("/tasks/<string:task_id>")
 @access_token_required
 def delete_task(access_token: AccessToken, task_id: UUID):
     deleted = crud.Tasks.delete({'id': task_id, 'user_id': access_token.user_id})

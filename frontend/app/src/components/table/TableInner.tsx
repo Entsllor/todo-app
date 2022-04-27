@@ -1,8 +1,15 @@
 import React from "react";
 import {ITask} from "../../interfaces"
+import TasksService from "../../services/tasksService";
 
-const TableInner: React.FC<{ tasks: ITask[] }> = (props) => {
+const TableInner: React.FC<{ tasks: ITask[], updater: CallableFunction; }> = (props) => {
     let tasks = props.tasks;
+
+    const deleteTask = async (taskID: string) => {
+        await TasksService.deleteTask(taskID).catch(() => alert("Failed to delete"));
+        props.updater()
+    }
+
     return (
         <div className="Table">
             <div style={{overflowX: "auto"}}>
@@ -18,14 +25,24 @@ const TableInner: React.FC<{ tasks: ITask[] }> = (props) => {
                         <th>
                             Status
                         </th>
+                        <th>
+                            Delete
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
-                    {tasks.map(value =>
-                        <tr key={value.id}>
-                            <td>{value.title}</td>
-                            <td>{value.deadline}</td>
-                            <td>{value.status}</td>
+                    {tasks.map(task =>
+                        <tr key={task.id}>
+                            <td>{task.title}</td>
+                            <td>{task.deadline}</td>
+                            <td>{task.status}</td>
+                            <td>
+                                <button
+                                    onClick={() => deleteTask(task.id)}
+                                    className="btn btn-danger btn-sm">
+                                    X
+                                </button>
+                            </td>
                         </tr>
                     )}
                     </tbody>

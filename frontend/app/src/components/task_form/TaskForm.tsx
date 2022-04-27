@@ -1,7 +1,7 @@
 import React from "react";
 import TasksService from "../../services/tasksService";
 
-const TaskForm: React.FC<{updater: CallableFunction}> = (props) => {
+const TaskForm: React.FC<{ updater: CallableFunction }> = (props) => {
     const createTask = async () => {
         let descriptionInput = document.getElementById("task-create-input-description")! as HTMLInputElement;
         let titleInput = document.getElementById("task-create-input-title")! as HTMLInputElement;
