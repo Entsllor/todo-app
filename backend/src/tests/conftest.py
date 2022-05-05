@@ -1,5 +1,7 @@
 import os
 
+os.environ["FLASK_ENV"] = "testing"  # noqa
+
 import pytest
 from sqlalchemy.orm import Session
 
@@ -28,7 +30,6 @@ USER_CREATE_DATA = {
 @pytest.fixture(scope='session')
 def app():
     """Session-wide test `Flask` application."""
-    os.environ["FLASK_ENV"] = "testing"
     app = create_app(get_settings())
 
     # Establish an application context before running the tests.
