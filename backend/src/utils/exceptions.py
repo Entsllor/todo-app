@@ -1,94 +1,69 @@
 import http
 
 STATUS_DESCRIPTIONS = {i_status.value: i_status.description for i_status in list(http.HTTPStatus)}
-
-
-class HTTPException(Exception):
-    def __init__(self, message: str = "", status_code: int = 400):
-        if not message:
-            message = STATUS_DESCRIPTIONS.get(status_code, "")
-        self.status_code = status_code
-        self.message = message
+DEFAULT_HTTP_ERROR_MESSAGE = "Internal Server Error. Please report this error admin@example.com"
+STATUS_DESCRIPTIONS[500] = DEFAULT_HTTP_ERROR_MESSAGE  # override 500 error description
 
 
 class BaseAppException(Exception):
-    as_http: HTTPException
+    message: str = ""
+
+    def __init__(self, message: str = ""):
+        if message:
+            self.message = message
 
 
 def handle_app_exception(exception: BaseAppException):
-    status_code = 500
-    message = "Internal Server Error. Please report this error admin@example.com"
-    if hasattr(exception, "as_http"):
-        status_code = exception.as_http.status_code
-        message = exception.as_http.message
+    status_code = getattr(exception, 'http_status_code', 500)
+    message = getattr(exception, 'message', STATUS_DESCRIPTIONS.get(status_code, DEFAULT_HTTP_ERROR_MESSAGE))
     return {"error_code": status_code, "error_description": message}, status_code
 
 
 class IncorrectLoginOrPassword(BaseAppException):
-    as_http = HTTPException(
-        status_code=401,
-        message="Incorrect username or password",
-    )
+    message = "Incorrect username or password"
+    http_status_code = 401
 
 
 class AccessTokenRequiredError(BaseAppException):
-    as_http = HTTPException(
-        status_code=401,
-        message="Excepted a JWT access token"
-    )
+    message = "Excepted a JWT access token"
+    http_status_code = 401
 
 
 class CredentialsException(BaseAppException):
-    as_http = HTTPException(
-        status_code=401,
-        message="Could not validate credentials"
-    )
+    message = "Could not validate credentials"
+    http_status_code = 401
 
 
 class InactiveUser(BaseAppException):
-    as_http = HTTPException(
-        status_code=401,
-        message="Current user is inactive"
-    )
+    message = "Current user is inactive"
+    http_status_code = 401
 
 
 class UserNotFoundError(BaseAppException):
-    as_http = HTTPException(
-        status_code=401,
-        message="Failed to find this User"
-    )
+    message = "Failed to find this User"
+    http_status_code = 401
 
 
 class Forbidden(BaseAppException):
-    as_http = HTTPException(
-        status_code=403,
-        message="Sorry, but you do not have enough rights"
-    )
+    message = "Sorry, but you do not have enough rights"
+    http_status_code = 403
 
 
 class ExpectedOneInstance(BaseAppException):
-    as_http = HTTPException(
-        status_code=409,
-        message="There are duplicates that cannot be processed"
-    )
+    message = "There are duplicates that cannot be processed"
+    http_status_code = 400
 
 
 class InstanceNotFound(BaseAppException):
-    as_http = HTTPException(
-        status_code=404,
-        message="Failed to find this object"
-    )
+    message = "Failed to find this object"
+    http_status_code = 404
 
 
 class ExpectedUniqueEmail(BaseAppException):
-    as_http = HTTPException(
-        status_code=400,
-        message="This email is already taken"
-    )
+    message = "This email is already taken"
+    http_status_code = 400
 
 
 class ExpectedUniqueLogin(BaseAppException):
-    as_http = HTTPException(
-        status_code=400,
-        message="This username is already taken"
-    )
+    message = "This username is already taken"
+    http_status_code = 400
