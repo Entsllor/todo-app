@@ -25,6 +25,7 @@ def test_create_user(client, session):
 def test_failed_create_user_not_unique_login(client, default_user):
     response = client.post(SIGN_UP_URL, json=USER_CREATE_DATA)
     assert response.status_code == 400, response.text
+    assert f"Login '{default_user.login}' is already token." in response.json['error_description']
 
 
 def test_login(default_user, client):

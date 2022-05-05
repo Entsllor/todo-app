@@ -12,7 +12,7 @@ class UsersCRUD(BaseCrud):
         hashed_password = get_password_hash(password)
         user_with_same_login = self.get_one({"login": login})
         if user_with_same_login:
-            raise exceptions.ExpectedUniqueLogin
+            raise exceptions.ExpectedUniqueLogin(f"Login '{login}' is already token.")
         else:
             user = models.User(login=login, hashed_password=hashed_password)
             db.session.add(user)
