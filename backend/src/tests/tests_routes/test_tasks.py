@@ -111,6 +111,7 @@ def test_failed_update_foreign_task(client, tasks, auth_header, second_user):
     }
     response = client.put(f"{TASKS_URL}{db_task.id}", json=new_data, headers=auth_header)
     assert response.status_code == 403, response.text
+    assert response.json['error_description'] == "You can update only your own tasks"
 
 
 def test_failed_update_task_unauthorized(client, tasks, default_user):
@@ -152,6 +153,7 @@ def test_failed_patch_foreign_task(client, tasks, auth_header, second_user):
     new_data = {"title": db_task.title + "__updated"}
     response = client.patch(f"{TASKS_URL}{db_task.id}", json=new_data, headers=auth_header)
     assert response.status_code == 403, response.text
+    assert response.json['error_description'] == "You can update only your own tasks"
 
 
 def test_failed_patch_task_unauthorized(client, tasks, default_user):
@@ -196,6 +198,7 @@ def test_failed_delete_foreign_task(client, tasks, auth_header, second_user):
     db_task = second_user.tasks[-1]
     response = client.delete(TASK_URL.format(db_task.id), headers=auth_header)
     assert response.status_code == 403
+    assert response.json['error_description'] == "You can delete only your own tasks"
 
 
 def test_failed_delete_task_unauthorized(client, tasks, default_user):
