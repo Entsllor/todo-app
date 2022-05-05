@@ -1,6 +1,6 @@
 # To-Do app
 
-> This app can help you organize your tasks
+> This app can help you to organize your tasks
 
 ## Installation
 
@@ -10,16 +10,16 @@ git clone https://github.com/Entsllor/todo-app
 
 ## Pre-requirements (backend)
 
-Create ./backend/app/.env file and set env variables
+Create ./backend/src/.env file and set env variables
 
 ```dotenv
-# backend/app/.env
+# ./backend/src/.env
 FLASK_ENV=production
 APP_DB_URI=postgresql://user:pass@db:5432/postgres
 APP_SECRET_KEY=YOUR-SECRET-KEY
 ```
 
-If you run project via docker-compose set hostname as 'db' (as in docker-compose.yml file)
+If you run project via docker-compose set hostname to 'DB' (as in docker-compose.yml file)
 else you can use 'localhost' or any other hostname.
 
 List of all backend env variables described in ./backend/app/core/settings.py file.
@@ -33,7 +33,7 @@ All variables should start with a specific prefix 'APP_'.
 
 ## Run
 
-Run this project by docker-compose
+Run this project by docker-compose:
 
 ```shell
 docker-compose up --build
@@ -41,13 +41,16 @@ docker-compose up --build
 
 ## Utils
 
-You can fill db with test data by command
+You can fill db with test data by command:
 
 ```shell
 flask fill_db
 ```
 
-Also, you can clear db by command
+This command will create several users with usernames like 'user_1' (user_2, etc.) and default passwords equal 'pass'.
+These users have some tasks with different status and titles.
+
+Also, you can clear DB by command:
 
 ```shell
 flask clear_db
