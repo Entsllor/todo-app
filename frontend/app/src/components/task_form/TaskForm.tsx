@@ -16,12 +16,12 @@ const TaskForm: React.FC<{ tasksUpdater: CallableFunction }> = (props) => {
     <div className="card-body">
       <div className="row row-cols-1 row-cols-md-2 h-100">
         <div className="col mb-3">
-                    <textarea
-                      id="task-create-input-description"
-                      className="form-control h-100"
-                      onChange={event => setDescription(event.target.value)}
-                      placeholder="description"
-                    />
+          <textarea
+            id="task-create-input-description"
+            className="form-control h-100"
+            onChange={event => setDescription(event.target.value)}
+            placeholder="description"
+          />
         </div>
         <div className="col mb-3">
           <div className="col mb-3">
