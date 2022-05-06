@@ -2,17 +2,17 @@ import React from "react";
 import {ITask} from "../../interfaces"
 import TasksService from "../../services/tasksService";
 
-const ToDoList: React.FC<{ tasks: ITask[], updater: CallableFunction; }> = (props) => {
+const ToDoList: React.FC<{ tasks: ITask[], tasksUpdater: CallableFunction; }> = (props) => {
   let tasks = props.tasks;
 
   const deleteTask = async (taskID: string) => {
     await TasksService.deleteTask(taskID).catch(() => alert("Failed to delete"));
-    props.updater()
+    props.tasksUpdater()
   }
 
   const setTaskStatus = async (taskID: string, newStatus: boolean = true) => {
     await TasksService.updateTask(taskID, {is_completed: newStatus}).catch(() => alert("Failed to update"));
-    props.updater()
+    props.tasksUpdater()
   }
 
   return (
@@ -21,18 +21,10 @@ const ToDoList: React.FC<{ tasks: ITask[], updater: CallableFunction; }> = (prop
         <table className="table">
           <thead>
           <tr>
-            <th>
-              Completed
-            </th>
-            <th>
-              Title
-            </th>
-            <th>
-              Deadline
-            </th>
-            <th>
-              Delete
-            </th>
+            <th>Completed</th>
+            <th>Title</th>
+            <th>Deadline</th>
+            <th>Delete</th>
           </tr>
           </thead>
           <tbody>

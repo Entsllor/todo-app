@@ -1,17 +1,16 @@
-import React from "react";
+import React, {useState} from "react";
 import TasksService from "../../services/tasksService";
 
-const TaskForm: React.FC<{ updater: CallableFunction }> = (props) => {
+const TaskForm: React.FC<{ tasksUpdater: CallableFunction }> = (props) => {
   const createTask = async () => {
-    let descriptionInput = document.getElementById("task-create-input-description")! as HTMLInputElement;
-    let titleInput = document.getElementById("task-create-input-title")! as HTMLInputElement;
-    let deadlineInput = document.getElementById("task-create-input-deadline")! as HTMLInputElement;
-    let description = descriptionInput.value || ""
-    let title = titleInput.value || ""
-    let deadline = deadlineInput.value || ""
     await TasksService.createTask(title, description, deadline);
-    props.updater()
+    props.tasksUpdater()
   }
+
+  const [description, setDescription] = useState<string>('');
+  const [title, setTitle] = useState<string>('')
+  const [deadline, setDeadline] = useState<string>('');
+
 
   return <div className="TaskForm">
     <div className="card-body">
@@ -20,6 +19,7 @@ const TaskForm: React.FC<{ updater: CallableFunction }> = (props) => {
                     <textarea
                       id="task-create-input-description"
                       className="form-control h-100"
+                      onChange={event => setDescription(event.target.value)}
                       placeholder="description"
                     />
         </div>
@@ -29,6 +29,7 @@ const TaskForm: React.FC<{ updater: CallableFunction }> = (props) => {
               id="task-create-input-title"
               className="form-control"
               type="text"
+              onChange={event => setTitle(event.target.value)}
               placeholder="title"
             />
           </div>
@@ -38,6 +39,7 @@ const TaskForm: React.FC<{ updater: CallableFunction }> = (props) => {
               id="task-create-input-deadline"
               className="form-control"
               type="datetime-local"
+              onChange={event => setDeadline(event.target.value)}
               placeholder="deadline"
             />
           </div>

@@ -20,8 +20,8 @@ const ToDoListWrapper: React.FC = () => {
   return <div className="TableWrapper">
     <div className="card">
       <div className="main-card-title">My Tasks</div>
-      <ToDoListList updater={updateTasks} tasks={tasks}/>
-      <TaskForm updater={updateTasks}/>
+      <ToDoListList tasksUpdater={updateTasks} tasks={tasks}/>
+      <TaskForm tasksUpdater={updateTasks}/>
     </div>
   </div>
 };
