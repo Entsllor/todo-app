@@ -49,7 +49,7 @@ _dev_settings = DevSettings()
 _prod_settings = AppSettings()
 
 
-def get_settings(mode: Literal['testings', 'development', 'production'] = None):
+def get_settings(mode: Literal['testing', 'development', 'production'] = None):
     if mode is None:
         mode = os.getenv("FLASK_ENV", "development").lower()
     match mode:

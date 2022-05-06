@@ -1,5 +1,7 @@
 import os
 
+from src.utils.url_utils import get_urls
+
 os.environ["FLASK_ENV"] = "testing"  # noqa
 
 import pytest
@@ -11,14 +13,6 @@ from src.core.database import db as _db
 from src.core.settings import get_settings
 from src.schemas.tokens import AuthTokensOut
 
-TESTDB = 'test_project.db'
-TESTDB_PATH = "/opt/project/data/{}".format(TESTDB)
-TEST_DATABASE_URI = 'sqlite:///' + TESTDB_PATH
-
-SIGN_UP_URL = 'api/auth/sign-up'
-LOGIN_URL = 'api/auth/login'
-LOGOUT_URL = 'api/auth/logout'
-REVOKE_URL = "api/auth/revoke"
 DEFAULT_USER_PASSWORD = "default_password"
 DEFAULT_USER_LOGIN = "DEFAULT_USERNAME"
 USER_CREATE_DATA = {
@@ -26,11 +20,14 @@ USER_CREATE_DATA = {
     'password': DEFAULT_USER_PASSWORD
 }
 
+test_app = create_app(get_settings('testing'))
+urls = get_urls(test_app)
+
 
 @pytest.fixture(scope='session')
 def app():
     """Session-wide test `Flask` application."""
-    app = create_app(get_settings())
+    app = test_app
 
     # Establish an application context before running the tests.
     ctx = app.app_context()
