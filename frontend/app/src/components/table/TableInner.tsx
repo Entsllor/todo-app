@@ -53,7 +53,7 @@ const TableInner: React.FC<{ tasks: ITask[], updater: CallableFunction; }> = (pr
                                     />
                                 </td>
                                 <td title={task.description}>{task.title}</td>
-                                <td>{task.deadline}</td>
+                                <td>{new Date(task.deadline).toLocaleString()}</td>
                                 <td>
                                     <button
                                         onClick={() => deleteTask(task.id)}
