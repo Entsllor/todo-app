@@ -2,7 +2,7 @@ import React from "react";
 import {ITask} from "../../interfaces"
 import TasksService from "../../services/tasksService";
 
-const TableInner: React.FC<{ tasks: ITask[], updater: CallableFunction; }> = (props) => {
+const ToDoList: React.FC<{ tasks: ITask[], updater: CallableFunction; }> = (props) => {
     let tasks = props.tasks;
 
     const deleteTask = async (taskID: string) => {
@@ -70,4 +70,4 @@ const TableInner: React.FC<{ tasks: ITask[], updater: CallableFunction; }> = (pr
     );
 };
 
-export default TableInner
+export default ToDoList

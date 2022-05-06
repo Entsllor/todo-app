@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import TableWrapper from '../table_wrapper/TableWrapper'
+import ToDoListWrapper from '../table_wrapper/ToDoListWrapper'
 import './App.css';
 import Header from "../header/Header";
 import AuthForm from "../auth_form/AuthForm"
@@ -13,7 +13,7 @@ function App() {
             <body className="main-container">
             <div className="row justify-content-center">
                 <div className="col col-12 col-lg-9">
-                    {jwt ? <TableWrapper/>: <AuthForm handleJWT={setJWT} jwt={jwt}/>}
+                    {jwt ? <ToDoListWrapper/>: <AuthForm handleJWT={setJWT} jwt={jwt}/>}
                 </div>
             </div>
             </body>
